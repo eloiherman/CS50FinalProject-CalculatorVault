@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Vault
+{% endblock %}
+
+{% block main %}
+
+    <div>
+    <table>
+        <thead>
+            <tr>
+                <th>Site Name</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Strength</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in data %}
+            <tr>
+                <td>{{ entry.site_name }}</td>
+                <td>{{ entry.username }}</td>
+                <td>
+                    <span id="masked-{{ entry.id }}">••••••••</span>
+                    <span id="pw-{{ entry.id }}" style="display:none;"></span>
+                    <button id = "btn-{{entry.id}}" type="button" class="btn btn-sm btn-outline-secondary"
+                        onclick="togglePassword({{ entry.id }})">
+                        Show
+                    </button>
+                </td>
+                <td>
+                  {% set score = entry.pw_strenght %}
+                  {% set labels = ["Very weak","Weak","Fair","Strong","Very strong"] %}
+                  {% set label = labels[score] if 0 <= score <= 4 else "Unknown" %}
+                  <span class="strength-{{ score }}">{{ label }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <div class="table-buttons">
+        <form action="/add" method="get" style="display:inline-block;">
+            <button type="submit" class="btn btn-success">Add</button>
+        </form>
+        <form action="/delete" method="get" style="display:inline-block; margin-left:10px;">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+async function togglePassword(id) {
+  const masked = document.getElementById(`masked-${id}`);
+  const pw     = document.getElementById(`pw-${id}`);
+  const btn    = document.getElementById(`btn-${id}`);
+
+  if (pw.style.display === "none" || !pw.style.display) {
+    if (!pw.textContent.trim()) {
+      const token = document.querySelector('meta[name="csrf-token"]').content;
+      const res = await fetch(`/vault_password/${id}`, {
+        method: "POST",
+        headers: { "X-CSRFToken": token }
+      });
+      if (!res.ok) {
+        alert("Could not retrieve password.");
+        return;
+      }
+      const data = await res.json();
+      pw.textContent = data.password;
+    }
+    masked.style.display = "none";
+    pw.style.display = "inline";
+    btn.textContent = "Hide";
+  }
+  else {
+    pw.style.display = "none";
+    masked.style.display = "inline";
+    btn.textContent = "Show";
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add
+{% endblock %}
+
+{% block main %}
+    <form method="post" action="/add" autocomplete="on">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="site_name" id="site_name" autocomplete= "off" placeholder="Site name" required>
+        <input type="text" name="username" id="username" autocomplete= "off" placeholder="Username" required>
+        <input type="password" name="password" id="password" autocomplete="off" placeholder = "Password" required>
+        <button type="submit">Add</button>
+    </form>
+
+{% endblock %}

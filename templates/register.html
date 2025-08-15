@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <form action="/register" method="post">
+        <div>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input autocomplete="off" autofocus name="username" placeholder="Username" type="text" placeholder="Username">
+        </div>
+        <div>
+            <input autocomplete="off"  name="password" placeholder="Password" type="password" placeholder="Password">
+        </div>
+        <div>
+            <input name="confirmation" placeholder="Confirm" type="password" placeholder="Confirmation">
+        </div>
+        <div>
+            <input name="calc_target" placeholder="Target" type="password" placeholder="Calc_Target">
+        </div>
+        <button type="submit">Register</button>
+    </form>
+{% endblock %}

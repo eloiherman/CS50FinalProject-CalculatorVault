@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Delete Account
+{% endblock %}
+
+{% block main %}
+<form action="/delete_account" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-danger">Delete My Account</button>
+</form>
+{% endblock %}

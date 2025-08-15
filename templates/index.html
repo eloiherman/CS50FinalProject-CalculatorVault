@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+
+{% block main %}
+
+    <h1>
+        Hello!
+    </h1>
+    <br>
+    <h3>
+        <div>This app is a secure password vault with a calculator-based unlock system.</div>
+        <br>
+
+        <div>Instead of typing a normal password, the user logs in and must solve a short calculator challenge to reach
+        a specific predetermined target number before the vault opens. Once unlocked, they can view, add, or delete stored site credentials. </div>
+        <br>
+        <div> The vault encrypts all stored passwords using a secret key, and decrypts them only when the user requests to reveal one.
+        The frontend uses HTML, CSS, and JavaScript for the interface and animations, while Flask handles routing, CSRF protection,
+        encryption, and communication with an SQLite database that stores encrypted data tied to each user. </div>
+
+    </h3>
+
+{% endblock %}

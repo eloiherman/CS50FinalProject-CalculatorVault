@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+{% block title %}Unlock Vault{% endblock %}
+
+{% block main %}
+
+<div class="calc">
+  <!-- <div class="target">Target: <strong>{{ target }}</strong></div> -->
+  <div id="display" aria-live="polite">0</div>
+
+  <form id="unlock-form" action="/unlock" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="expr" id="expr-input">
+  </form>
+
+  <div class="keys">
+    <button type="button" data-key="7">7</button>
+    <button type="button" data-key="8">8</button>
+    <button type="button" data-key="9">9</button>
+    <button type="button" data-key="/" class="op">÷</button>
+
+    <button type="button" data-key="4">4</button>
+    <button type="button" data-key="5">5</button>
+    <button type="button" data-key="6">6</button>
+    <button type="button" data-key="*" class="op">×</button>
+
+    <button type="button" data-key="1">1</button>
+    <button type="button" data-key="2">2</button>
+    <button type="button" data-key="3">3</button>
+    <button type="button" data-key="-" class="op">−</button>
+
+    <button type="button" data-key="0">0</button>
+    <button type="button" data-key="C" class="danger">C</button>
+    <button type="button" data-key="=" class="equal">=</button>
+    <button type="button" data-key="+" class="op">+</button>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  const TARGET = {{target}};
+
+  const display = document.querySelector('#display');
+  const form    = document.querySelector('#unlock-form');
+  const exprIn  = document.querySelector('#expr-input');
+
+  let expr = "0";
+  const OPS = ['+','-','*','/'];
+  const isOp = ch => OPS.includes(ch);
+  const last = () => expr[expr.length - 1];
+
+  function setExpr(next) {
+    expr = next;
+    display.textContent = expr;
+  }
+
+  function append(token) {
+    if (token === 'AC') return setExpr("0");
+    if (token === 'C')  return backspace();
+    if (token === '=')  return submitExpr();
+
+    if (expr === "0") {
+      if (/[0-9]/.test(token)) return setExpr(token);
+      if (isOp(token)) return;
+    }
+
+    if (isOp(token) && isOp(last())) return;
+
+    setExpr(expr + token);
+  }
+
+  function backspace() {
+    if (expr.length <= 1) return setExpr("0");
+    setExpr(expr.slice(0, -1));
+  }
+
+  function submitExpr() {
+    try {
+        if (isOp(last())) return;
+
+        const value = Function(`return (${expr});`)();
+        setExpr(String(value));
+
+        if (Number.isInteger(TARGET) && value === TARGET) {
+            exprIn.value = String(value);
+            form.submit();
+        }
+    } catch {
+    }
+}
+
+  function shake() {
+    display.classList.remove('shake');
+    void display.offsetWidth;
+    display.classList.add('shake');
+  }
+
+  function flashSuccess() {
+  display.classList.remove('success');
+  void display.offsetWidth;
+  display.classList.add('success');
+  }
+
+  document.querySelectorAll('.keys [data-key]').forEach(btn => {
+    btn.addEventListener('click', () => append(btn.getAttribute('data-key')));
+    btn.classList.remove('clicked');
+    void btn.offsetWidth;
+    btn.classList.add('clicked');
+  });
+
+  window.addEventListener('keydown', (e) => {
+    const k = e.key;
+    if (/[0-9]/.test(k)) return append(k);
+    if (['+','-','*','/'].includes(k)) return append(k);
+    if (k === 'Enter' || k === '=') return submitExpr();
+    if (k === 'Backspace') return backspace();
+    if (!e.ctrlKey && !e.metaKey && (k === 'c' || k === 'C')) return append('C');
+  });
+})();
+
+</script>
+{% endblock %}
