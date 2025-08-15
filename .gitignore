@@ -8,6 +8,6 @@ flask_session/
 venv/
 .venv/
 
-.db 
+app.db 
 
 .env
