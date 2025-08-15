@@ -27,6 +27,8 @@ VAULT_KEY = os.getenv("VAULT_KEY")
 fernet = Fernet(VAULT_KEY)
 
 
+
+
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
